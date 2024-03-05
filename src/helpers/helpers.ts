@@ -10,20 +10,28 @@ type FilterClauseType = {
 export const insertQuestionsData = async (questions: any[]) => {
   try {
     for (const question of questions) {
-      await Questions.create({
-        id: question.id,
-        name: question.name,
-        type: question.type,
-        value: question.value,
-      });
+      const questionExists = await Questions.findOne({
+        where: {
+          id: question.id
+        }
+      })
 
-      if (question?.type === "MultipleChoice") {
-        for (const opt of question?.options) {
-          await Options.create({
-            questionId: question.id,
-            label: opt?.label,
-            value: opt?.value,
-          });
+      if (!questionExists) {
+        await Questions.create({
+          id: question.id,
+          name: question.name,
+          type: question.type,
+          value: question.value,
+        });
+
+        if (question?.type === "MultipleChoice") {
+          for (const opt of question?.options) {
+            await Options.create({
+              questionId: question.id,
+              label: opt?.label,
+              value: opt?.value,
+            });
+          }
         }
       }
     }
