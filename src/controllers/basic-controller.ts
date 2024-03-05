@@ -8,12 +8,18 @@ import { Questions } from "../models";
 // @Access Public
 const filteredResponses = async (req: Request, res: Response) => {
   const limit = 5;
-
   const filtersParam = req.query.filters as string;
-  const decodedFiltersString = decodeURIComponent(filtersParam);
-  const filters = JSON.parse(decodedFiltersString);
 
   try {
+    
+    if (!filtersParam) {
+      const data = await Questions.findAll();
+      res.status(200).send(data);
+    }
+
+    const decodedFiltersString = decodeURIComponent(filtersParam);
+    const filters = JSON.parse(decodedFiltersString);
+
     const whereClause = {
       [Op.or]: filters.map((filter: any) => {
         // This is a helper util function which returns returns the matching Sequelize operator corresponding to user-defined operators
@@ -61,4 +67,3 @@ const filteredResponses = async (req: Request, res: Response) => {
 };
 
 export { filteredResponses };
-
